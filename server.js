@@ -7,18 +7,52 @@ const url = require('url')
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`,'utf-8');
 const dataObject = JSON.parse(data);
 
+const templateOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`,'utf-8');
+const templateCard = fs.readFileSync(`${__dirname}/templates/template-card.html`,'utf-8');
+const templateProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`,'utf-8');
+
+const contentTypeHtml = {'Content-type': 'text/html'}
+
+const replaceTemplate = (temp,product)=>{
+
+    let output = temp.replace(/{%PRODUCTNAME%}/g,product.productName)
+    output = output.replace(/{%IMAGE%}/g,product.image);
+    output = output.replace(/{%PRICE%}/g,product.price);
+    output = output.replace(/{%FROM%}/g,product.from);
+    output = output.replace(/{%NUTRIENTSCTNAME%}/g,product.nutrients);
+    output = output.replace(/{%QUANTITY%}/g,product.quantity);
+    output = output.replace(/{%PRICE%}/g,product.price);
+    output = output.replace(/{%DESCRP%}/g,product.description);
+    output = output.replace(/{%ID%}/g,product.id);
+
+    if(!product.organic) output = output.replace(/{%NOT_ORGANIC%}/g,'not-organic');
+
+    return output
+
+}
 
 //create server
 const server = http.createServer((req,res)=>{
 
     const pathName = req.url;
 
+    //overview
     if(pathName === '/' || pathName === '/overview'){
-        return res.end('this is overview')
+        res.writeHead(200,contentTypeHtml)
+
+        const cardHtml = dataObject.map(card => replaceTemplate(templateCard,card)).join('');
+        // console.log("cardHtml", cardHtml)
+        const output = templateOverview.replace('{%PRODUCT_CARD%}', cardHtml)
+
+        return res.end(output)
     }
+
+    //produc
     if(pathName === '/product'){
         return res.end('this is product route')
     }
+
+    //api
     if(pathName === '/api'){
 
         
@@ -32,6 +66,7 @@ const server = http.createServer((req,res)=>{
         //     return res.end(data)
         // })
 
+        //404
         res.writeHead(200,{
             'Content-type': 'application/json'
             })
