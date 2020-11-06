@@ -1,4 +1,7 @@
-const fs = require('fs')
+//first simple write and read file
+
+const fs = require('fs');
+
 
 //read file sync bloquing way
 const textInput = fs.readFileSync('./txt/input.txt', 'utf-8')
@@ -27,3 +30,4 @@ fs.readFile('./txt/start.txt', 'utf-8', (err, data1) => {
     })
 })
 console.log('lu avant l\'assychrone du dessu')
+
